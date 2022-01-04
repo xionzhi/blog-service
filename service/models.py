@@ -33,7 +33,7 @@ class BaseModel(db.Model):
 
 
 class BLOGUsersModel(BaseModel):
-    __tablename__ = 'blog_users'
+    __tablename__ = 'users'
 
     name = db.Column(db.String(254), nullable=False, comment='用户名')
     slug = db.Column(db.String(254), nullable=False, comment='别名')
@@ -59,10 +59,10 @@ class BLOGUsersModel(BaseModel):
 
 
 class BLOGPostsModel(BaseModel):
-    __tablename__ = 'blog_posts'
+    __tablename__ = 'posts'
 
     title = db.Column(db.String(254), nullable=False, comment='标题')
-    slug = db.Column(db.String(254), nullable=False, comment='标题路由')
+    slug = db.Column(db.String(254), nullable=False, unique=True, index=True, comment='标题路由')
     markdown = db.Column(db.Text, nullable=False, comment='markdown')
     html = db.Column(db.Text, nullable=False, comment='html')
     image = db.Column(db.String(254), nullable=False, comment='标题')
@@ -74,14 +74,14 @@ class BLOGPostsModel(BaseModel):
 
 
 class BLOGTagsModel(BaseModel):
-    __tablename__ = 'blog_tags'
+    __tablename__ = 'tags'
 
     name = db.Column(db.String(254), nullable=False, comment='标签名')
     slug = db.Column(db.String(254), nullable=False, comment='标签别名')
 
 
 class BLOGPostsTagsModel(BaseModel):
-    __tablename__ = 'blog_posts_tags'
+    __tablename__ = 'posts_tags'
 
     post_id = db.Column(db.Integer, nullable=False, comment='文章id')
     tag_id = db.Column(db.Integer, nullable=False, comment='标签id')

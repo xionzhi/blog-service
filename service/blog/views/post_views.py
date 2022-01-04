@@ -12,6 +12,12 @@
 from flask.views import MethodView
 from flask import jsonify, request
 
+from service import db
+from service.models import (BLOGUsersModel,
+                            BLOGPostsModel,
+                            BLOGTagsModel,
+                            BLOGPostsTagsModel)
+
 
 class HandlerPostDetailView(MethodView):
     @staticmethod
@@ -21,15 +27,17 @@ class HandlerPostDetailView(MethodView):
         :return:
         """
         _slug: str = request.args.get('slug')
-        post_data = {
-            'title': 'test title',
-            'create_time': '2022-01-01',
-            'author': 'test user',
-            'post_markdown': '## AAA',
-            'tags': 'tag1',
-            'path': _slug,
-        }
-        return jsonify(dict(code=200, data=post_data, msg='ok'))
+        post_query: BLOGPostsModel = db.session.query(BLOGPostsModel). \
+            filter(BLOGPostsModel.slug == _slug).first()
+        post_dict: dict = post_query.as_dict()
+
+        user_query: BLOGUsersModel = db.session.query(BLOGUsersModel). \
+            filter(BLOGUsersModel.id == post_query.author_id).first()
+        user_dict: dict = user_query.as_dict()
+
+        post_dict['user_info'] = user_dict
+
+        return jsonify(dict(code=200, data=post_dict, msg='ok'))
 
     @staticmethod
     def post():

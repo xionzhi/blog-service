@@ -19,10 +19,10 @@ from flask import jsonify
 class HandlerAccountView(MethodView):
     @staticmethod
     def get():
-        query = db.session.query(BLOGUsersModel).first()
+        user_query = db.session.query(BLOGUsersModel).first()
 
-        print(query.as_dict())
-        return jsonify(query)
+        user_data: BLOGUsersModel = user_query.as_dict()
+        return jsonify(user_data)
 
     @staticmethod
     def post():
