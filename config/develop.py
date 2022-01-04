@@ -22,10 +22,10 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # mysql
-DATABASE_HOST = ''
-DATABASE_PASSWORD = ''
-DATABASE_USER = ''
-DATABASE_NAME = ''
+DATABASE_HOST = 'localhost'
+DATABASE_PASSWORD = '123456'
+DATABASE_USER = 'root'
+DATABASE_NAME = 'blog'
 DATABASE_PORT = 3306
 DATABASE_CHARSET = 'utf8mb4'
 MYSQL_DATABASE_URL = f'mysql+pymysql://{DATABASE_USER}:{DATABASE_PASSWORD}@' \
@@ -37,9 +37,9 @@ SQLITE_FILE_NAME = 'blog_dev.db'
 SQLITE_DATABASE_URL = f'sqlite:///{BASE_DIR}/db/{SQLITE_FILE_NAME}'
 
 # redis
-REDIS_HOST = '192.168.191.14'
+REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
-REDIS_DB = 2
+REDIS_DB = 0
 REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
 
 # logging

@@ -19,9 +19,6 @@ from uuid import uuid4
 from service import app
 
 
-__all__ = ['client']
-
-
 @pytest.fixture
 def client():
     db_fd, db_path = tempfile.mkstemp()

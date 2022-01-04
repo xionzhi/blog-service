@@ -23,7 +23,6 @@ def test_user_create(client,
     }
 
     resp = client.post('/v1/api/admin/account', json=params).json
-
     assert resp['code'] == 200
 
 
@@ -33,6 +32,4 @@ def test_user_query(client):
     }
 
     resp = client.get('/v1/api/admin/account', query_string=params).json
-
     assert resp['code'] == 200
-    assert resp['data']['id'] == params['user_id']

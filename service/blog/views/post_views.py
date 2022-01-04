@@ -13,10 +13,17 @@ from flask.views import MethodView
 from flask import jsonify, request
 
 from service import db
+from service.common.errors import ApiRequestException
+from service.common.bolts import success_response
+
+from service.schema import (BLOGUsersSchema,
+                            BLOGPostsSchema,
+                            )
 from service.models import (BLOGUsersModel,
                             BLOGPostsModel,
                             BLOGTagsModel,
-                            BLOGPostsTagsModel)
+                            BLOGPostsTagsModel,
+                            )
 
 
 class HandlerPostDetailView(MethodView):
@@ -27,17 +34,22 @@ class HandlerPostDetailView(MethodView):
         :return:
         """
         _slug: str = request.args.get('slug')
+
         post_query: BLOGPostsModel = db.session.query(BLOGPostsModel). \
             filter(BLOGPostsModel.slug == _slug).first()
-        post_dict: dict = post_query.as_dict()
+
+        if not post_query:
+            raise ApiRequestException(400, 'params error')
+
+        post_data: dict = BLOGPostsSchema().dump(post_query)
 
         user_query: BLOGUsersModel = db.session.query(BLOGUsersModel). \
             filter(BLOGUsersModel.id == post_query.author_id).first()
-        user_dict: dict = user_query.as_dict()
+        user_data: dict = BLOGUsersSchema().dump(user_query)
 
-        post_dict['user_info'] = user_dict
+        post_data['user_data'] = user_data
 
-        return jsonify(dict(code=200, data=post_dict, msg='ok'))
+        return success_response(data=dict(post_data=post_data))
 
     @staticmethod
     def post():
@@ -45,4 +57,22 @@ class HandlerPostDetailView(MethodView):
         文章新增
         :return:
         """
-        return jsonify({})
+        _title = request.json['title']
+        _slug = request.json['slug']
+        _markdown = request.json['markdown']
+        _html = request.json['html']
+        _author_id = request.json['author_id']
+
+        post_query = BLOGPostsModel(
+            title=_title,
+            slug=_slug,
+            markdown=_markdown,
+            html=_html,
+            author_id=_author_id)
+
+        db.session.add(post_query)
+        db.session.commit()
+
+        post_data: dict = BLOGPostsSchema().dump(post_query)
+
+        return success_response(data=dict(post_data=post_data))

@@ -9,13 +9,14 @@
 # Description：
 """
 
+from flask.views import MethodView
+from flask import jsonify, request
+
 from service import db
 from service.models import (BLOGUsersModel)
 from service.schema import (BLOGUsersSchema)
 from service.common.errors import ApiRequestException
-
-from flask.views import MethodView
-from flask import jsonify, request
+from service.common.bolts import success_response
 
 
 class HandlerAccountView(MethodView):
@@ -31,7 +32,7 @@ class HandlerAccountView(MethodView):
 
         user_data = BLOGUsersSchema().dump(user_query)
 
-        return jsonify(dict(code=200, data=user_data))
+        return success_response(data=dict(user_data=user_data))
 
     @staticmethod
     def post():
@@ -51,4 +52,4 @@ class HandlerAccountView(MethodView):
 
         user_data = BLOGUsersSchema().dump(user_query)
 
-        return jsonify(dict(code=200, data=user_data))
+        return success_response(data=dict(user_data=user_data))

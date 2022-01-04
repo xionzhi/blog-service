@@ -8,14 +8,13 @@
 # version    ：python 3.9
 # Description：
 """
-import json
-
 from service import ma
 
 from service.models import (BLOGUsersModel,
                             BLOGPostsModel,
                             BLOGTagsModel,
-                            BLOGPostsTagsModel,)
+                            BLOGPostsTagsModel,
+                            )
 
 
 class BaseSchema(ma.SQLAlchemyAutoSchema):
@@ -29,3 +28,18 @@ class BaseSchema(ma.SQLAlchemyAutoSchema):
 class BLOGUsersSchema(BaseSchema):
     class Meta:
         model = BLOGUsersModel
+
+
+class BLOGPostsSchema(BaseSchema):
+    class Meta:
+        model = BLOGPostsModel
+
+
+class BLOGTagsSchema(BaseSchema):
+    class Meta:
+        model = BLOGTagsModel
+
+
+class BLOGPostsTagsSchema(BaseSchema):
+    class Meta:
+        model = BLOGPostsTagsModel

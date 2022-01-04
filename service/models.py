@@ -9,6 +9,7 @@
 # Description：
 """
 
+from typing import DefaultDict
 from service import db, bcrypt
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -64,9 +65,9 @@ class BLOGPostsModel(BaseModel):
     title = db.Column(db.String(254), nullable=False, comment='标题')
     slug = db.Column(db.String(254), nullable=False, unique=True, index=True, comment='标题路由')
     markdown = db.Column(db.Text, nullable=False, comment='markdown')
-    html = db.Column(db.Text, nullable=False, comment='html')
-    image = db.Column(db.String(254), nullable=False, comment='标题')
-    post_status = db.Column(db.String(254), nullable=False, comment='标题')
+    html = db.Column(db.Text, nullable=False, default='', comment='html')
+    image = db.Column(db.String(254), nullable=False, default='', comment='标题图片')
+    post_status = db.Column(db.String(254), nullable=False, default='', comment='文章发布状态')
     language = db.Column(db.String(6), comment='语言')
     meta_title = db.Column(db.String(254), comment='')
     meta_description = db.Column(db.String(254), comment='')
