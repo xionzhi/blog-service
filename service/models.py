@@ -26,21 +26,24 @@ class BaseModel(db.Model):
     mtime = db.Column(db.DateTime, nullable=False, default=datetime.now, onupdate=datetime.now, comment='更新时间')
 
     def as_dict(self):
-        return {t.name: getattr(self, t.name) for t in self.__table__.columns}
+        return {
+            t.name: getattr(self, t.name)
+            for t in self.__table__.columns
+        }
 
 
 class BLOGUsersModel(BaseModel):
     __tablename__ = 'blog_users'
 
-    name = db.Column(db.String(150), nullable=False, comment='用户名')
-    slug = db.Column(db.String(150), nullable=False, comment='别名')
-    password = db.Column(db.String(60), nullable=False, comment='密码')
+    name = db.Column(db.String(254), nullable=False, comment='用户名')
+    slug = db.Column(db.String(254), nullable=False, comment='别名')
+    password = db.Column(db.String(254), nullable=False, comment='密码')
     email = db.Column(db.String(254), nullable=False, unique=True, index=True, comment='邮箱')
-    image = db.Column(db.TEXT, comment='图片')
-    cover = db.Column(db.TEXT, comment='头像')
-    bio = db.Column(db.String(200), comment='')
-    website = db.Column(db.TEXT, comment='网址')
-    location = db.Column(db.TEXT, comment='位置')
+    image = db.Column(db.String(254), comment='图片')
+    cover = db.Column(db.String(254), comment='头像')
+    bio = db.Column(db.String(254), comment='')
+    website = db.Column(db.String(254), comment='网址')
+    location = db.Column(db.String(254), comment='位置')
     language = db.Column(db.String(6), comment='语言')
     meta_title = db.Column(db.String(254), comment='')
     meta_description = db.Column(db.String(254), comment='')
@@ -53,3 +56,33 @@ class BLOGUsersModel(BaseModel):
     @_password.setter
     def _password(self, pwd):
         self.password = bcrypt.generate_password_hash(pwd, 8)
+
+
+class BLOGPostsModel(BaseModel):
+    __tablename__ = 'blog_posts'
+
+    title = db.Column(db.String(254), nullable=False, comment='标题')
+    slug = db.Column(db.String(254), nullable=False, comment='标题路由')
+    markdown = db.Column(db.Text, nullable=False, comment='markdown')
+    html = db.Column(db.Text, nullable=False, comment='html')
+    image = db.Column(db.String(254), nullable=False, comment='标题')
+    post_status = db.Column(db.String(254), nullable=False, comment='标题')
+    language = db.Column(db.String(6), comment='语言')
+    meta_title = db.Column(db.String(254), comment='')
+    meta_description = db.Column(db.String(254), comment='')
+    author_id = db.Column(db.Integer, nullable=False, comment='作者ID')
+
+
+class BLOGTagsModel(BaseModel):
+    __tablename__ = 'blog_tags'
+
+    name = db.Column(db.String(254), nullable=False, comment='标签名')
+    slug = db.Column(db.String(254), nullable=False, comment='标签别名')
+
+
+class BLOGPostsTagsModel(BaseModel):
+    __tablename__ = 'blog_posts_tags'
+
+    post_id = db.Column(db.Integer, nullable=False, comment='文章id')
+    tag_id = db.Column(db.Integer, nullable=False, comment='标签id')
+    sort_order = db.Column(db.Integer, nullable=False, comment='标签排序')

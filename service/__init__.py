@@ -46,7 +46,9 @@ def init_route():
     init route
     """
     from service.admin.urls import admin_site
+    from service.blog.urls import blog_site
     app.register_blueprint(admin_site)
+    app.register_blueprint(blog_site)
 
 
 init_route()

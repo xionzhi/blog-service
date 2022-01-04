@@ -21,7 +21,8 @@ class HandlerAccountView(MethodView):
     def get():
         query = db.session.query(BLOGUsersModel).first()
 
-        return jsonify([])
+        print(query.as_dict())
+        return jsonify(query)
 
     @staticmethod
     def post():
