@@ -32,6 +32,8 @@ app.config.setdefault('SQLALCHEMY_DATABASE_URI', app.config['SQLITE_DATABASE_URL
 
 db = SQLAlchemy(app)
 
+ma = Marshmallow(app)
+
 redis_store = FlaskRedis(app, decode_responses=True)
 
 bcrypt = Bcrypt(app)

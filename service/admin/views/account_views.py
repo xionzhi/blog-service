@@ -10,27 +10,45 @@
 """
 
 from service import db
-from service.models import BLOGUsersModel
+from service.models import (BLOGUsersModel)
+from service.schema import (BLOGUsersSchema)
+from service.common.errors import ApiRequestException
 
 from flask.views import MethodView
-from flask import jsonify
+from flask import jsonify, request
 
 
 class HandlerAccountView(MethodView):
     @staticmethod
     def get():
-        user_query = db.session.query(BLOGUsersModel).first()
+        _user_id = request.args.get('user_id', 0, str)
 
-        user_data: BLOGUsersModel = user_query.as_dict()
-        return jsonify(user_data)
+        user_query: BLOGUsersModel = db.session.query(BLOGUsersModel). \
+            filter(BLOGUsersModel.id == _user_id).first()
+
+        if not user_query:
+            raise ApiRequestException(400, 'params error')
+
+        user_data = BLOGUsersSchema().dump(user_query)
+
+        return jsonify(dict(code=200, data=user_data))
 
     @staticmethod
     def post():
-        db.session.add(BLOGUsersModel(
-            name='admin',
-            slug='slug',
-            _password='123456',
-            email='admin@blog.com'
-        ))
+        _name: str = request.json['name']
+        _slug: str = request.json['slug']
+        _password: str = request.json['password']
+        _email: str = request.json['email']
+
+        user_query = BLOGUsersModel(
+            name=_name,
+            slug=_slug,
+            _password=_password,
+            email=_email)
+
+        db.session.add(user_query)
         db.session.commit()
-        return jsonify([])
+
+        user_data = BLOGUsersSchema().dump(user_query)
+
+        return jsonify(dict(code=200, data=user_data))
