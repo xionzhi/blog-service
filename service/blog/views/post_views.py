@@ -76,3 +76,66 @@ class HandlerPostDetailView(MethodView):
         post_data: dict = BLOGPostsSchema().dump(post_query)
 
         return success_response(data=dict(post_data=post_data))
+
+    @staticmethod
+    def put():
+        """
+        文章修改
+        """
+        _post_id = request.json['post_id']
+        _title = request.json['title']
+        _slug = request.json['slug']
+        _markdown = request.json['markdown']
+        _html = request.json['html']
+
+        db.session.query(BLOGPostsModel). \
+            filter(BLOGPostsModel.id == _post_id). \
+            update({BLOGPostsModel.title: _title,
+                    BLOGPostsModel.slug: _slug,
+                    BLOGPostsModel.markdown: _markdown,
+                    BLOGPostsModel.html: _html})
+        
+        db.session.commit()
+        return success_response(data=dict())
+
+    @staticmethod
+    def patch():
+        """
+        文章状态
+        """
+        _post_id = request.json['post_id']
+        _post_status = request.json['post_status']
+
+        db.session.query(BLOGPostsModel). \
+            filter(BLOGPostsModel.id == _post_id). \
+            update({BLOGPostsModel.post_status: _post_status})
+
+        db.session.commit()
+        return success_response(data=dict())
+
+
+class HandlerPostListlView(MethodView):
+    @staticmethod
+    def get():
+        """
+        文章列表
+        """
+        _page = request.args.get('page', 1, int)
+        _size = request.args.get('size', 10, int)
+
+        post_query = db.session.query(BLOGPostsModel). \
+            filter(BLOGPostsModel.status == 1)
+
+        post_query = post_query.limit(_size).offset((_page -1 ) * _size)
+
+        post_list = BLOGPostsSchema(many=True).dump(post_query.all())
+        total = post_query.count()
+
+        # update user dict
+        pass
+
+        # update tags dict
+        pass
+
+        return success_response(data=dict(post_list=post_list,
+                                          total=total, page=_page, size=_size))
