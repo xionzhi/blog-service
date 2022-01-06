@@ -10,7 +10,7 @@
 """
 
 from flask.views import MethodView
-from flask import jsonify, request
+from flask import request
 
 from service import db
 from service.common.errors import ApiRequestException
@@ -62,12 +62,17 @@ class HandlerPostDetailView(MethodView):
         _markdown = request.json['markdown']
         _html = request.json['html']
         _author_id = request.json['author_id']
+        _post_status = request.json.get('post_status', 'draft')
+
+        if db.session.query(BLOGPostsModel.slug).filter(BLOGPostsModel.slug == _slug).first():
+            raise ApiRequestException(401, 'unique slug')
 
         post_query = BLOGPostsModel(
             title=_title,
             slug=_slug,
             markdown=_markdown,
             html=_html,
+            post_status=_post_status,
             author_id=_author_id)
 
         db.session.add(post_query)
@@ -124,7 +129,9 @@ class HandlerPostListlView(MethodView):
         _size = request.args.get('size', 10, int)
 
         post_query = db.session.query(BLOGPostsModel). \
-            filter(BLOGPostsModel.status == 1)
+            filter(BLOGPostsModel.status == 1,
+                   BLOGPostsModel.post_status == 'publish'). \
+            order_by(BLOGPostsModel.id.desc())
 
         post_query = post_query.limit(_size).offset((_page -1 ) * _size)
 
