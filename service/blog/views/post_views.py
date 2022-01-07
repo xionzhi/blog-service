@@ -33,7 +33,10 @@ class HandlerPostDetailView(MethodView):
         文章查询
         :return:
         """
-        _slug: str = request.args.get('slug')
+        _slug: str = request.args.get('slug', None)
+
+        if not _slug:
+            raise ApiRequestException('401', 'params error')
 
         post_query: BLOGPostsModel = db.session.query(BLOGPostsModel). \
             filter(BLOGPostsModel.slug == _slug).first()
@@ -57,12 +60,12 @@ class HandlerPostDetailView(MethodView):
         文章新增
         :return:
         """
-        _title = request.json['title']
-        _slug = request.json['slug']
-        _markdown = request.json['markdown']
-        _html = request.json['html']
-        _author_id = request.json['author_id']
-        _post_status = request.json.get('post_status', 'draft')
+        _title: str = request.json['title']
+        _slug: str = request.json['slug']
+        _markdown: str = request.json['markdown']
+        _html: str = request.json['html']
+        _author_id: int = request.json['author_id']
+        _post_status: str = request.json.get('post_status', 'draft')
 
         if db.session.query(BLOGPostsModel.slug).filter(BLOGPostsModel.slug == _slug).first():
             raise ApiRequestException(401, 'unique slug')
@@ -87,11 +90,11 @@ class HandlerPostDetailView(MethodView):
         """
         文章修改
         """
-        _post_id = request.json['post_id']
-        _title = request.json['title']
-        _slug = request.json['slug']
-        _markdown = request.json['markdown']
-        _html = request.json['html']
+        _post_id: int = request.json['post_id']
+        _title: str = request.json['title']
+        _slug: str = request.json['slug']
+        _markdown: str = request.json['markdown']
+        _html: str = request.json['html']
 
         db.session.query(BLOGPostsModel). \
             filter(BLOGPostsModel.id == _post_id). \
@@ -108,8 +111,8 @@ class HandlerPostDetailView(MethodView):
         """
         文章状态
         """
-        _post_id = request.json['post_id']
-        _post_status = request.json['post_status']
+        _post_id: int = request.json['post_id']
+        _post_status: str = request.json['post_status']
 
         db.session.query(BLOGPostsModel). \
             filter(BLOGPostsModel.id == _post_id). \
@@ -125,8 +128,8 @@ class HandlerPostListView(MethodView):
         """
         文章列表
         """
-        _page = request.args.get('page', 1, int)
-        _size = request.args.get('size', 10, int)
+        _page: int = request.args.get('page', 1, int)
+        _size: int = request.args.get('size', 10, int)
 
         post_query = db.session.query(BLOGPostsModel). \
             filter(BLOGPostsModel.status == 1,

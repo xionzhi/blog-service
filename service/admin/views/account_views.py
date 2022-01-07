@@ -22,7 +22,7 @@ from service.common.bolts import success_response
 class HandlerAccountView(MethodView):
     @staticmethod
     def get():
-        _user_id = request.args.get('user_id', 0, str)
+        _user_id: int = request.args.get('user_id', 0, str)
 
         user_query: BLOGUsersModel = db.session.query(BLOGUsersModel). \
             filter(BLOGUsersModel.id == _user_id).first()

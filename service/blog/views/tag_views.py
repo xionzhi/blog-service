@@ -22,7 +22,7 @@ from service.schema import (BLOGTagsSchema)
 class HandlerTagDetailView(MethodView):
     @staticmethod
     def get():
-        _name = request.args.get('name', None)
+        _name: str = request.args.get('name', None)
 
         if not _name:
             raise ApiRequestException('401', 'params error')
@@ -40,7 +40,7 @@ class HandlerTagDetailView(MethodView):
         标签新增
         :return:
         """
-        _name = request.json['name']
+        _name: str = request.json['name']
 
         if db.session.query(BLOGTagsModel.name).filter(BLOGTagsModel.name == _name).first():
             raise ApiRequestException(401, 'unique name')
@@ -62,8 +62,8 @@ class HandlerTagDetailView(MethodView):
         标签删除
         :return:
         """
-        _tag_id = request.json['tag_id']
-        _name = request.json['name']
+        _tag_id: int = request.json['tag_id']
+        _name: str = request.json['name']
 
         db.session.query(BLOGTagsModel). \
             filter(BLOGTagsModel.id == _tag_id,
@@ -81,7 +81,7 @@ class HandlerTagListView(MethodView):
         标签列表
         :return:
         """
-        _keyword = request.args.get('keyword', None, str)
+        _keyword: str = request.args.get('keyword', None, str)
 
         tag_query = db.session.query(BLOGTagsModel). \
             filter(BLOGTagsModel.status == 1)

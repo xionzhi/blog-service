@@ -9,10 +9,10 @@
 # Description：
 """
 
-from flask import jsonify, make_response
+from flask import jsonify, make_response, Response
 
 
-def success_response(data: dict, code: int = 200, msg: str = 'success'):
+def success_response(data: dict, code: int = 200, msg: str = 'success') -> Response:
     if 200 >= code <= 299:
         code = 200
     return make_response(jsonify(code=code, data=data, msg=msg), code)
