@@ -9,6 +9,8 @@
 # Description：
 """
 
+import typing as t
+
 from flask.views import MethodView
 from flask import request
 
@@ -18,6 +20,8 @@ from service.common.bolts import success_response
 
 from service.schema import (BLOGUsersSchema,
                             BLOGPostsSchema,
+                            BLOGPostsTagsSchema,
+                            JoinBLOGTagsAndBLOGPostsTags,
                             )
 from service.models import (BLOGUsersModel,
                             BLOGPostsModel,
@@ -46,11 +50,24 @@ class HandlerPostDetailView(MethodView):
 
         post_data: dict = BLOGPostsSchema().dump(post_query)
 
+        # query user
         user_query: BLOGUsersModel = db.session.query(BLOGUsersModel). \
             filter(BLOGUsersModel.id == post_query.author_id).first()
         user_data: dict = BLOGUsersSchema().dump(user_query)
 
         post_data['user_data'] = user_data
+
+        # query tag join post
+        post_join_tags_query = db.session.query(BLOGPostsTagsModel.tag_id,
+                                                BLOGTagsModel.name,
+                                                BLOGTagsModel.slug). \
+            join(BLOGTagsModel, BLOGTagsModel.id == BLOGPostsTagsModel.tag_id). \
+            filter(BLOGPostsTagsModel.post_id == post_query.id,
+                   BLOGPostsTagsModel.status == 1). \
+            order_by(BLOGPostsTagsModel.sort_order.asc()).all()
+        post_tags_list = JoinBLOGTagsAndBLOGPostsTags(many=True).dump(post_join_tags_query)
+
+        post_data['post_tags_list'] = post_tags_list
 
         return success_response(data=dict(post_data=post_data))
 
@@ -66,6 +83,7 @@ class HandlerPostDetailView(MethodView):
         _html: str = request.json['html']
         _author_id: int = request.json['author_id']
         _post_status: str = request.json.get('post_status', 'draft')
+        _post_tags: list = request.json.get('post_tags', [])
 
         if db.session.query(BLOGPostsModel.slug).filter(BLOGPostsModel.slug == _slug).first():
             raise ApiRequestException(401, 'unique slug')
@@ -77,8 +95,16 @@ class HandlerPostDetailView(MethodView):
             html=_html,
             post_status=_post_status,
             author_id=_author_id)
-
         db.session.add(post_query)
+        db.session.flush()
+
+        # insert post tags
+        if _post_tags:
+            post_id = post_query.id
+            _ = [{'post_id': post_id, 'tag_id': tag_id, 'sort_order': idx}
+                 for idx, tag_id in enumerate(_post_tags)]
+            db.session.bulk_insert_mappings(BLOGPostsTagsModel, _)
+
         db.session.commit()
 
         post_data: dict = BLOGPostsSchema().dump(post_query)
@@ -95,6 +121,7 @@ class HandlerPostDetailView(MethodView):
         _slug: str = request.json['slug']
         _markdown: str = request.json['markdown']
         _html: str = request.json['html']
+        _post_tags: list = request.json.get('post_tags', [])
 
         db.session.query(BLOGPostsModel). \
             filter(BLOGPostsModel.id == _post_id). \
@@ -102,6 +129,35 @@ class HandlerPostDetailView(MethodView):
                     BLOGPostsModel.slug: _slug,
                     BLOGPostsModel.markdown: _markdown,
                     BLOGPostsModel.html: _html})
+
+        if _post_tags:
+            # get sort index
+            sort_post_tags: dict = {i: idx for idx, i in enumerate(_post_tags)}
+
+            # query post_tags
+            post_tags_query: t.List[BLOGPostsTagsModel] = db.session.query(BLOGPostsTagsModel). \
+                filter(BLOGPostsTagsModel.post_id == _post_id,
+                       BLOGPostsTagsModel.status == 1). \
+                order_by(BLOGPostsTagsModel.sort_order.asc()).all()
+            post_tags_list: list = [i.tag_id for i in post_tags_query]
+
+            if post_tags_list != _post_tags:
+                # update tags
+                for _query in post_tags_query:
+                    idx = sort_post_tags.get(_query.tag_id, 0)
+                    if idx:
+                        _query.sort_order = idx
+                    else:
+                        _query.status = 0
+
+                # in _post_tags but not in post_tags_list -> is new
+                new_tags = set(_post_tags) - set(post_tags_list)
+                if new_tags:
+                    _ = [{'post_id': _post_id,
+                          'tag_id': tag_id,
+                          'sort_order': sort_post_tags.get(tag_id)}
+                         for idx, tag_id in enumerate(new_tags)]
+                    db.session.bulk_insert_mappings(BLOGPostsTagsModel, _)
         
         db.session.commit()
         return success_response(data=dict())

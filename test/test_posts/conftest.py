@@ -40,6 +40,11 @@ def post_id():
 
 
 @pytest.fixture
+def post_tags():
+    return [1]
+
+
+@pytest.fixture
 def post_status():
     """
     publish or draft

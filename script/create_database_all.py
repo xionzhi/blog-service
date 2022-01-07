@@ -16,6 +16,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from service import db
 from service.models import (DICTPostsTagsModel,
                             BLOGSettingsModel,
+                            BLOGTagsModel,
                             DICTTableRowsModel)
 
 
@@ -43,6 +44,10 @@ def init_dict_table():
              {'key': 'cover', 'value': '', 'type': 'blog'}]
         db.session.bulk_insert_mappings(BLOGSettingsModel, _)
 
+    def tags():
+        _ = [{'name': 'test', 'slug': 'test'}]
+        db.session.bulk_insert_mappings(BLOGTagsModel, _)
+
     def dict_table_rows():
         _ = []
         for table in db.get_tables_for_bind():
@@ -52,6 +57,7 @@ def init_dict_table():
 
     dict_post_status()
     settings()
+    tags()
     dict_table_rows()
     db.session.commit()
 

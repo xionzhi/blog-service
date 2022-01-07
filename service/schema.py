@@ -43,3 +43,7 @@ class BLOGTagsSchema(BaseSchema):
 class BLOGPostsTagsSchema(BaseSchema):
     class Meta:
         model = BLOGPostsTagsModel
+
+
+class JoinBLOGTagsAndBLOGPostsTags(BLOGTagsSchema, BLOGPostsTagsSchema):
+    pass

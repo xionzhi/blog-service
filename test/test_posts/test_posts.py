@@ -15,13 +15,15 @@ def test_post_create(client,
                      post_slug,
                      post_markdown,
                      post_html,
-                     post_author_id):
+                     post_author_id,
+                     post_tags):
     params = {
         'title': post_title,
         'slug': post_slug,
         'markdown': post_markdown,
         'html': post_html,
-        'author_id': post_author_id
+        'author_id': post_author_id,
+        'post_tags': post_tags,
     }
 
     resp = client.post('/v1/api/post/detail', json=params).json
@@ -42,13 +44,15 @@ def test_post_change(client,
                      post_title,
                      post_slug,
                      post_markdown,
-                     post_html):
+                     post_html,
+                     post_tags):
     params = {
         'post_id': post_id,
         'title': post_title,
         'slug': post_slug,
         'markdown': post_markdown,
-        'html': post_html
+        'html': post_html,
+        'post_tags': [2, 3] + post_tags,
     }
     post = client.get('/v1/api/post/detail', query_string=params).json
     assert post['code'] == 200
