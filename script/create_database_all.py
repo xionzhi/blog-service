@@ -45,7 +45,9 @@ def init_dict_table():
         db.session.bulk_insert_mappings(BLOGSettingsModel, _)
 
     def tags():
-        _ = [{'name': 'test', 'slug': 'test'}]
+        _ = [{'name': 'test1', 'slug': 'test1'},
+             {'name': 'test2', 'slug': 'test2'},
+             {'name': 'test3', 'slug': 'test3'}]
         db.session.bulk_insert_mappings(BLOGTagsModel, _)
 
     def dict_table_rows():

@@ -41,7 +41,12 @@ def post_id():
 
 @pytest.fixture
 def post_tags():
-    return [1]
+    return [1, 2]
+
+
+@pytest.fixture
+def update_post_tags():
+    return [3, 2]
 
 
 @pytest.fixture

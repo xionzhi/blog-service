@@ -20,7 +20,6 @@ from service.common.bolts import success_response
 
 from service.schema import (BLOGUsersSchema,
                             BLOGPostsSchema,
-                            BLOGPostsTagsSchema,
                             JoinBLOGTagsAndBLOGPostsTags,
                             )
 from service.models import (BLOGUsersModel,
