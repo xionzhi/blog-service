@@ -14,6 +14,7 @@ import socket
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
+from flask_caching import Cache
 from flask_marshmallow import Marshmallow
 from flask_redis import FlaskRedis
 from flask_sqlalchemy import SQLAlchemy
@@ -33,6 +34,8 @@ app.config.setdefault('SQLALCHEMY_DATABASE_URI', app.config['SQLITE_DATABASE_URL
 db = SQLAlchemy(app)
 
 ma = Marshmallow(app)
+
+cache = Cache(app)
 
 redis_store = FlaskRedis(app, decode_responses=True)
 

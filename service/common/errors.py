@@ -49,5 +49,7 @@ def all_exception_handler(error):
         return jsonify({'msg': f'{error.description}', 'code': error.code, 'data': None}), error.code
 
     logger.error(traceback.format_exc())
+    if app.debug is True:
+        print(traceback.format_exc())
 
     return jsonify({'msg': '服务器内部错误', 'code': 500, 'data': None}), 200

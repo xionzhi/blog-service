@@ -11,6 +11,8 @@
 
 import typing as t
 
+from itertools import groupby
+
 from flask.views import MethodView
 from flask import request
 
@@ -18,9 +20,9 @@ from service import db
 from service.common.errors import ApiRequestException
 from service.common.bolts import success_response
 
-from service.schema import (BLOGUsersSchema,
+from service.schema import (BLOGPostsTagsSchema, \
+                            BLOGUsersSchema,
                             BLOGPostsSchema,
-                            JoinBLOGTagsAndBLOGPostsTags,
                             )
 from service.models import (BLOGUsersModel,
                             BLOGPostsModel,
@@ -42,7 +44,8 @@ class HandlerPostDetailView(MethodView):
             raise ApiRequestException('401', 'params error')
 
         post_query: BLOGPostsModel = db.session.query(BLOGPostsModel). \
-            filter(BLOGPostsModel.slug == _slug).first()
+            filter(BLOGPostsModel.slug == _slug,
+                   BLOGPostsModel.post_status == 'publish').first()
 
         if not post_query:
             raise ApiRequestException(400, 'params error')
@@ -56,16 +59,14 @@ class HandlerPostDetailView(MethodView):
 
         post_data['user_data'] = user_data
 
-        # query tag join post
-        post_join_tags_query = db.session.query(BLOGPostsTagsModel.tag_id,
-                                                BLOGPostsTagsModel.sort_order,
-                                                BLOGTagsModel.name,
-                                                BLOGTagsModel.slug,). \
-            join(BLOGTagsModel, BLOGTagsModel.id == BLOGPostsTagsModel.tag_id). \
+        # query tag
+        post_tags_query = db.session.query(BLOGPostsTagsModel.tag_id,
+                                           BLOGPostsTagsModel.tag_name,
+                                           BLOGPostsTagsModel.sort_order). \
             filter(BLOGPostsTagsModel.post_id == post_query.id,
                    BLOGPostsTagsModel.status == 1). \
             order_by(BLOGPostsTagsModel.sort_order.asc()).all()
-        post_tags_list = JoinBLOGTagsAndBLOGPostsTags(many=True).dump(post_join_tags_query)
+        post_tags_list = BLOGPostsTagsSchema(many=True).dump(post_tags_query)
 
         post_data['post_tags_list'] = post_tags_list
 
@@ -101,8 +102,11 @@ class HandlerPostDetailView(MethodView):
         # insert post tags
         if _post_tags:
             post_id = post_query.id
-            _ = [{'post_id': post_id, 'tag_id': tag_id, 'sort_order': idx}
-                 for idx, tag_id in enumerate(_post_tags)]
+            _ = [{'post_id': post_id, 
+                  'tag_id': tag_item['tag_id'], 
+                  'tag_name': tag_item['tag_name'], 
+                  'sort_order': idx}
+                 for idx, tag_item in enumerate(_post_tags)]
             db.session.bulk_insert_mappings(BLOGPostsTagsModel, _)
 
         db.session.commit()
@@ -121,7 +125,7 @@ class HandlerPostDetailView(MethodView):
         _slug: str = request.json['slug']
         _markdown: str = request.json['markdown']
         _html: str = request.json['html']
-        _post_tags: list = request.json.get('post_tags', [])
+        _post_tags: list = request.json.get('post_tags', [])  # [{tag_id: 1, tag_name: 'A'}]
 
         db.session.query(BLOGPostsModel). \
             filter(BLOGPostsModel.id == _post_id). \
@@ -132,7 +136,8 @@ class HandlerPostDetailView(MethodView):
 
         if _post_tags:
             # get sort index
-            sort_post_tags: dict = {i: idx for idx, i in enumerate(_post_tags)}
+            sort_post_tags: dict = {i['tag_id']: i.update(idx=idx) or i for idx, i in enumerate(_post_tags)}
+            post_tags_ids: list = list(sort_post_tags.keys())
 
             # query post_tags
             post_tags_query: t.List[BLOGPostsTagsModel] = db.session.query(BLOGPostsTagsModel). \
@@ -141,22 +146,24 @@ class HandlerPostDetailView(MethodView):
                 order_by(BLOGPostsTagsModel.sort_order.asc()).all()
             post_tags_list: list = [i.tag_id for i in post_tags_query]
 
-            if post_tags_list != _post_tags:
+            if post_tags_list != post_tags_ids:
                 # update tags
                 for _query in post_tags_query:
-                    idx = sort_post_tags.get(_query.tag_id, 0)
-                    if idx:
-                        _query.sort_order = idx
+                    item: dict = sort_post_tags.get(_query.tag_id)
+                    if item:
+                        _query.tag_name = item['tag_name']
+                        _query.sort_order = item['idx']
                     else:
                         _query.status = 0
 
-                # in _post_tags but not in post_tags_list -> is new
-                new_tags = set(_post_tags) - set(post_tags_list)
+                # in _post_tags but not in post_tags_list -> is new = {1, 2, 3}
+                new_tags: set = set(post_tags_ids) - set(post_tags_list)
                 if new_tags:
                     _ = [{'post_id': _post_id,
                           'tag_id': tag_id,
-                          'sort_order': sort_post_tags.get(tag_id)}
-                         for idx, tag_id in enumerate(new_tags)]
+                          'tag_name': sort_post_tags[tag_id]['tag_name'],
+                          'sort_order': sort_post_tags[tag_id]['idx']}
+                         for tag_id in new_tags]
                     db.session.bulk_insert_mappings(BLOGPostsTagsModel, _)
         
         db.session.commit()
@@ -203,20 +210,23 @@ class HandlerPostListView(MethodView):
                                       BLOGUsersModel.image,
                                       BLOGUsersModel.cover). \
             filter(BLOGUsersModel.id.in_([i['author_id'] for i in post_list])).all()
-        user_data_list = BLOGUsersSchema(many=True).dump(user_query)
-        user_data_dict = {i.id: i for i in user_data_list}
+        user_data_dict = {i.id: BLOGUsersSchema().dump(i) for i in user_query}
 
         # update tags dict
-        post_ids = [i['id'] for i in post_list]
         tags_query = db.session.query(BLOGPostsTagsModel.tag_id,
+                                      BLOGPostsTagsModel.tag_name,
                                       BLOGPostsTagsModel.post_id,
-                                      BLOGTagsModel.name). \
-            join(BLOGTagsModel, BLOGPostsTagsModel.id == BLOGPostsTagsModel.tag_id). \
-            filter(BLOGPostsTagsModel.post_id.in_(post_ids),
+                                      BLOGPostsTagsModel.sort_order). \
+            filter(BLOGPostsTagsModel.post_id.in_([i.id for i in post_query]),
                    BLOGPostsTagsModel.status == 1). \
-            order_by(BLOGPostsTagsModel.sort_order.asc()).all()
+            order_by(BLOGPostsTagsModel.post_id.asc()).all()
         # group by post_id
-        pass
+        tags_list: list = BLOGPostsTagsSchema(many=True).dump(tags_query)
+        tags_data_dict = {k: sorted(v, key=lambda x: x.get('sort_order')) 
+                          for k, v in groupby(tags_list, key=lambda x: x.get('post_id'))}
+
+        post_list = [i.update(user_data=user_data_dict[i['author_id']],
+                              post_tags_list=tags_data_dict[i['id']]) or i for i in post_list]
 
         return success_response(data=dict(post_list=post_list,
                                           total=total, page=_page, size=_size))

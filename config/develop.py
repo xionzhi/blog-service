@@ -54,5 +54,9 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.addHandler(HANDLER)
 LOGGER.setLevel(LOGGER_LEVEL)
 
+# cache
+CACHE_TYPE = 'SimpleCache'
+CACHE_DEFAULT_TIMEOUT = 60 * 1
+
 WEBSITE_HOST = ''
 FILE_SERVICE_HOST = ''

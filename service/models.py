@@ -88,9 +88,6 @@ class BLOGTagsModel(BaseModel):
 
 
 class BLOGPostsTagsModel(BaseModel):
-    """
-    maybe add column tag_name?
-    """
     __tablename__ = 'posts_tags'
 
     post_id = db.Column(db.Integer, nullable=False, comment='文章id')

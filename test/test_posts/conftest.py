@@ -30,12 +30,12 @@ def post_id():
 
 @pytest.fixture
 def post_tags():
-    return [1, 2]
+    return [{'tag_id': 1, 'tag_name': 'test1'}, {'tag_id': 2, 'tag_name': 'test2'}]
 
 
 @pytest.fixture
 def update_post_tags():
-    return [3, 2]
+    return [{'tag_id': 3, 'tag_name': 'test3'}, {'tag_id': 2, 'tag_name': 'test2'}]
 
 
 @pytest.fixture
