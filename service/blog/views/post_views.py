@@ -119,7 +119,7 @@ class HandlerPostDetailView(MethodView):
         return success_response(data=dict())
 
 
-class HandlerPostListlView(MethodView):
+class HandlerPostListView(MethodView):
     @staticmethod
     def get():
         """
@@ -133,7 +133,7 @@ class HandlerPostListlView(MethodView):
                    BLOGPostsModel.post_status == 'publish'). \
             order_by(BLOGPostsModel.id.desc())
 
-        post_query = post_query.limit(_size).offset((_page -1 ) * _size)
+        post_query = post_query.limit(_size).offset((_page - 1) * _size)
 
         post_list = BLOGPostsSchema(many=True).dump(post_query.all())
         total = post_query.count()

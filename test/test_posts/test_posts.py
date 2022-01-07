@@ -9,6 +9,7 @@
 # Description：
 """
 
+
 def test_post_create(client,
                      post_title,
                      post_slug,
@@ -69,6 +70,7 @@ def test_post_change_status(client,
 
     resp = client.patch('/v1/api/post/detail', json=params).json
     assert resp['code'] == 200
+
 
 def test_post_query_list(client,
                          page=1,

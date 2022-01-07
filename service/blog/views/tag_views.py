@@ -20,6 +20,19 @@ from service.schema import (BLOGTagsSchema)
 
 
 class HandlerTagDetailView(MethodView):
+    @staticmethod
+    def get():
+        _name = request.args.get('name', None)
+
+        if not _name:
+            raise ApiRequestException('401', 'params error')
+
+        tag_query = db.session.query(BLOGTagsModel). \
+            filter(BLOGTagsModel.name == _name).first()
+
+        tag_data = BLOGTagsSchema().dump(tag_query)
+
+        return success_response(data=dict(tag_data=tag_data))
 
     @staticmethod
     def post():
