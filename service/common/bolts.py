@@ -12,5 +12,7 @@
 from flask import jsonify, make_response
 
 
-def success_response(data: dict, code: int=200, msg: str='success'):
-    return make_response(jsonify(code=code, data=data, msg=msg), 200)
+def success_response(data: dict, code: int = 200, msg: str = 'success'):
+    if 200 >= code <= 299:
+        code = 200
+    return make_response(jsonify(code=code, data=data, msg=msg), code)
