@@ -85,6 +85,7 @@ class BLOGTagsModel(BaseModel):
 
     __table_args__ = (db.Index('tags_name_status_IDX', 'name', 'status', unique=True), )
 
+
 class BLOGPostsTagsModel(BaseModel):
     __tablename__ = 'posts_tags'
 
@@ -92,8 +93,26 @@ class BLOGPostsTagsModel(BaseModel):
     tag_id = db.Column(db.Integer, nullable=False, comment='标签id')
     sort_order = db.Column(db.Integer, nullable=False, comment='标签排序')
 
+    __table_args__ = (db.Index('posts_tags_post_id_IDX', 'post_id'),
+                      db.Index('posts_tags_tag_id_IDX', 'tag_id'),)
 
-#### DICT ####
+
+class BLOGSettingsModel(BaseModel):
+    __tablename__ = 'settings'
+
+    key = db.Column(db.String(254), nullable=False, comment='设置key')
+    value = db.Column(db.String(254), nullable=False, comment='设置value')
+    type = db.Column(db.String(254), nullable=False, comment='blog core')
+
+
+class DICTTableRowsModel(BaseModel):
+    """
+    maybe in redis or memory?
+    """
+    __tablename__ = 'dict_table_rows'
+
+    name = db.Column(db.String(254), nullable=False, comment='表名')
+    seq = db.Column(db.Integer, nullable=False, comment='行数量')
 
 
 class DICTPostsTagsModel(BaseModel):

@@ -14,7 +14,9 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from service import db
-from service.models import (DICTPostsTagsModel)
+from service.models import (DICTPostsTagsModel,
+                            BLOGSettingsModel,
+                            DICTTableRowsModel)
 
 
 def drop_database():
@@ -31,7 +33,26 @@ def init_dict_table():
              {'post_status': 'publish', 'post_status_cn': 'publish'}]
         db.session.bulk_insert_mappings(DICTPostsTagsModel, _)
 
+    def settings():
+        _ = [{'key': 'title', 'value': 'blog title', 'type': 'core'},
+             {'key': 'description', 'value': 'blog description', 'type': 'core'},
+             {'key': 'language', 'value': 'zh-cn', 'type': 'core'},
+             {'key': 'page_size', 'value': '10', 'type': 'blog'},
+             {'key': 'is_private', 'value': '0', 'type': 'blog'},
+             {'key': 'logo', 'value': '', 'type': 'blog'},
+             {'key': 'cover', 'value': '', 'type': 'blog'}]
+        db.session.bulk_insert_mappings(BLOGSettingsModel, _)
+
+    def dict_table_rows():
+        _ = []
+        for table in db.get_tables_for_bind():
+            count = db.session.query(table).count()
+            _.append({'name': table.name, 'seq': count})
+        db.session.bulk_insert_mappings(DICTTableRowsModel, _)
+
     dict_post_status()
+    settings()
+    dict_table_rows()
     db.session.commit()
 
 
