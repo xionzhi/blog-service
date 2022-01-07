@@ -57,7 +57,8 @@ class BLOGUsersModel(BaseModel):
     def _password(self, pwd):
         self.password = bcrypt.generate_password_hash(pwd, 8)
 
-    __table_args__ = (db.Index('users_email_IDX', 'email', unique=True), )
+    __table_args__ = (db.Index('users_email_IDX', 'email', unique=True),
+                      db.Index('users_name_IDX', 'name', unique=True), )
 
 
 class BLOGPostsModel(BaseModel):
@@ -87,10 +88,14 @@ class BLOGTagsModel(BaseModel):
 
 
 class BLOGPostsTagsModel(BaseModel):
+    """
+    maybe add column tag_name?
+    """
     __tablename__ = 'posts_tags'
 
     post_id = db.Column(db.Integer, nullable=False, comment='文章id')
     tag_id = db.Column(db.Integer, nullable=False, comment='标签id')
+    tag_name = db.Column(db.String(254), nullable=False, comment='标签名')
     sort_order = db.Column(db.Integer, nullable=False, comment='标签排序')
 
     __table_args__ = (db.Index('posts_tags_post_id_IDX', 'post_id'),

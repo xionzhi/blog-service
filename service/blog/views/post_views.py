@@ -58,8 +58,9 @@ class HandlerPostDetailView(MethodView):
 
         # query tag join post
         post_join_tags_query = db.session.query(BLOGPostsTagsModel.tag_id,
+                                                BLOGPostsTagsModel.sort_order,
                                                 BLOGTagsModel.name,
-                                                BLOGTagsModel.slug). \
+                                                BLOGTagsModel.slug,). \
             join(BLOGTagsModel, BLOGTagsModel.id == BLOGPostsTagsModel.tag_id). \
             filter(BLOGPostsTagsModel.post_id == post_query.id,
                    BLOGPostsTagsModel.status == 1). \
@@ -197,9 +198,24 @@ class HandlerPostListView(MethodView):
         total = post_query.count()
 
         # update user dict
-        pass
+        user_query = db.session.query(BLOGUsersModel.id,
+                                      BLOGUsersModel.name,
+                                      BLOGUsersModel.image,
+                                      BLOGUsersModel.cover). \
+            filter(BLOGUsersModel.id.in_([i['author_id'] for i in post_list])).all()
+        user_data_list = BLOGUsersSchema(many=True).dump(user_query)
+        user_data_dict = {i.id: i for i in user_data_list}
 
         # update tags dict
+        post_ids = [i['id'] for i in post_list]
+        tags_query = db.session.query(BLOGPostsTagsModel.tag_id,
+                                      BLOGPostsTagsModel.post_id,
+                                      BLOGTagsModel.name). \
+            join(BLOGTagsModel, BLOGPostsTagsModel.id == BLOGPostsTagsModel.tag_id). \
+            filter(BLOGPostsTagsModel.post_id.in_(post_ids),
+                   BLOGPostsTagsModel.status == 1). \
+            order_by(BLOGPostsTagsModel.sort_order.asc()).all()
+        # group by post_id
         pass
 
         return success_response(data=dict(post_list=post_list,

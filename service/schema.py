@@ -28,6 +28,7 @@ class BaseSchema(ma.SQLAlchemyAutoSchema):
 class BLOGUsersSchema(BaseSchema):
     class Meta:
         model = BLOGUsersModel
+        exclude = ['ctime', 'email', 'id', 'last_login', 'mtime', 'password', 'uuid']
 
 
 class BLOGPostsSchema(BaseSchema):
