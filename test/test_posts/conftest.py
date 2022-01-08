@@ -43,7 +43,8 @@ def post_status():
     """
     publish or draft
     """
-    return 'publish' if randint(0, 1) else 'draft'
+    # return 'publish' if randint(0, 1) else 'draft'
+    return 'publish'
 
 
 @pytest.fixture

@@ -14,6 +14,7 @@ from service.models import (BLOGUsersModel,
                             BLOGPostsModel,
                             BLOGTagsModel,
                             BLOGPostsTagsModel,
+                            BLOGSettingsModel,
                             )
 
 
@@ -48,3 +49,8 @@ class BLOGPostsTagsSchema(BaseSchema):
 
 class JoinBLOGTagsAndBLOGPostsTags(BLOGTagsSchema, BLOGPostsTagsSchema):
     pass
+
+
+class BLOGSettingsSchema(BaseSchema):
+    class Meta:
+        model = BLOGSettingsModel

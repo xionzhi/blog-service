@@ -15,6 +15,7 @@ def test_post_create(client,
                      post_slug,
                      post_markdown,
                      post_html,
+                     post_status,
                      post_author_id,
                      post_tags):
     params = {
@@ -22,6 +23,7 @@ def test_post_create(client,
         'slug': post_slug,
         'markdown': post_markdown,
         'html': post_html,
+        'post_status': post_status,
         'author_id': post_author_id,
         'post_tags': post_tags,
     }
