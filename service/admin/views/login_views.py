@@ -18,6 +18,7 @@ from service.common.bolts import (success_response,
                                   timestamp_now,
                                   bcrypt_checkpw)
 from service.common.errors import ApiRequestException
+from service.common.wrapper import verify_login
 from service.models import (BLOGUsersModel)
 from service.schema import (BLOGUsersSchema)
 
@@ -48,6 +49,7 @@ class HandlerLoginView(MethodView):
         return success_response(data=dict(user_data=user_data))
 
     @staticmethod
+    @verify_login(request)
     def delete():
         _token = request.json['token']
 
@@ -58,6 +60,7 @@ class HandlerLoginView(MethodView):
         return success_response(data=dict())
 
     @staticmethod
+    @verify_login(request)
     def put():
         _token = request.json['token']
         _user_data = request.json['user_data']

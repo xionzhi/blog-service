@@ -58,8 +58,11 @@ def test_user_login_update(client,
         'token': test_user_login['data']['user_data']['token'],
         'user_data': test_user_login['data']['user_data'],
     }
+    headers = {
+        'token': params['token']
+    }
 
-    resp = client.put('/v1/api/admin/login', json=params).json
+    resp = client.put('/v1/api/admin/login', json=params, headers=headers).json
     print(resp)
     assert resp['code'] == 200
 
@@ -69,6 +72,9 @@ def test_user_signout(client,
     params = {
         'token': test_user_login['data']['user_data']['token']
     }
+    headers = {
+        'token': params['token']
+    }
 
-    resp = client.delete('/v1/api/admin/login', json=params).json
+    resp = client.delete('/v1/api/admin/login', json=params, headers=headers).json
     assert resp['code'] == 200
