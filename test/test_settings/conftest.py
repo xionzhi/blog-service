@@ -22,20 +22,15 @@ hex_uuid = uuid4().hex
 
 
 @pytest.fixture()
-def user_name():
-    return f'测试用户{hex_uuid}'
+def settings_type():
+    return 'core'
 
 
 @pytest.fixture()
-def user_slug():
-    return f'测试标记{hex_uuid}'
+def settings_key():
+    return 'title'
 
 
 @pytest.fixture()
-def user_password():
-    return '123456'
-
-
-@pytest.fixture()
-def user_email():
-    return f'{hex_uuid}@blog.com'
+def settings_value():
+    return f'{hex_uuid}'

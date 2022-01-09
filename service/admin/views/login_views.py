@@ -13,9 +13,10 @@ from uuid import uuid4
 from flask.views import MethodView
 from flask import request
 
-from service import db, bcrypt, cache
+from service import db, cache
 from service.common.bolts import (success_response, 
-                                  timestamp_now)
+                                  timestamp_now,
+                                  bcrypt_checkpw)
 from service.common.errors import ApiRequestException
 from service.models import (BLOGUsersModel)
 from service.schema import (BLOGUsersSchema)
@@ -34,7 +35,7 @@ class HandlerLoginView(MethodView):
         if not user_query:
             raise ApiRequestException(400, 'user error or pwd error')
 
-        if bcrypt.check_password_hash(user_query.password, _password) is False:
+        if bcrypt_checkpw(_password, user_query.password) is False:
             raise ApiRequestException(400, 'user error or pwd error')
 
         # set token
@@ -48,15 +49,21 @@ class HandlerLoginView(MethodView):
 
     @staticmethod
     def delete():
-        _token = request.args['token'] 
+        _token = request.json['token']
+
+        if not cache.get(_token):
+            raise ApiRequestException(400, 'params error')
         cache.delete(_token)
 
         return success_response(data=dict())
 
     @staticmethod
     def put():
-        _token = request.args['token']
-        _user_data = request.args['user_data']
+        _token = request.json['token']
+        _user_data = request.json['user_data']
+
+        if not cache.get(_token):
+            raise ApiRequestException(400, 'params error')
 
         _user_data['expired'] = timestamp_now() + 60 * 60
         cache.set(_token, _user_data, 60 * 60)

@@ -10,6 +10,7 @@
 """
 
 from time import time
+from bcrypt import hashpw, checkpw, gensalt
 
 from flask import jsonify, make_response, Response
 
@@ -22,3 +23,11 @@ def success_response(data: dict, code: int = 200, msg: str = 'success') -> Respo
 
 def timestamp_now():
     return int(time())
+
+
+def bcrypt_hashpw(password: str):
+    return hashpw(password.encode('utf-8'), gensalt())
+
+
+def bcrypt_checkpw(password, hashed):
+    return checkpw(password.encode('utf-8'), hashed)

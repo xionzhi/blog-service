@@ -12,7 +12,6 @@
 import socket
 
 from flask import Flask
-from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_caching import Cache
 from flask_marshmallow import Marshmallow
@@ -35,8 +34,6 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 cache = Cache(app)
-
-bcrypt = Bcrypt(app)
 
 CORS(app)
 

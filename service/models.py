@@ -9,11 +9,12 @@
 # Description：
 """
 
-from service import db, bcrypt
-from sqlalchemy.ext.hybrid import hybrid_property
-
 from uuid import uuid4
 from datetime import datetime
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from service import db
+from service.common.bolts import bcrypt_hashpw
 
 
 class BaseModel(db.Model):
@@ -55,7 +56,7 @@ class BLOGUsersModel(BaseModel):
 
     @_password.setter
     def _password(self, pwd):
-        self.password = bcrypt.generate_password_hash(pwd, 8)
+        self.password = bcrypt_hashpw(pwd)
 
     __table_args__ = (db.Index('users_email_IDX', 'email', unique=True),
                       db.Index('users_name_IDX', 'name', unique=True), )
