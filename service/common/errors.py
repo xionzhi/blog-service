@@ -20,6 +20,7 @@ from service import logger, app
 class ApiRequestException(HTTPException):
     """
     错误异常捕获
+    https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Status
     """
     code = 400
     description = None

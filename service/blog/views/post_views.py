@@ -41,7 +41,7 @@ class HandlerPostDetailView(MethodView):
         _slug: str = request.args.get('slug', None)
 
         if not _slug:
-            raise ApiRequestException('401', 'params error')
+            raise ApiRequestException(400, 'params error')
 
         post_query: BLOGPostsModel = db.session.query(BLOGPostsModel). \
             filter(BLOGPostsModel.slug == _slug,
@@ -87,7 +87,7 @@ class HandlerPostDetailView(MethodView):
         _post_tags: list = request.json.get('post_tags', [])
 
         if db.session.query(BLOGPostsModel.slug).filter(BLOGPostsModel.slug == _slug).first():
-            raise ApiRequestException(401, 'unique slug')
+            raise ApiRequestException(400, 'unique slug')
 
         post_query = BLOGPostsModel(
             title=_title,

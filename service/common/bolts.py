@@ -9,6 +9,8 @@
 # Description：
 """
 
+from time import time
+
 from flask import jsonify, make_response, Response
 
 
@@ -16,3 +18,7 @@ def success_response(data: dict, code: int = 200, msg: str = 'success') -> Respo
     if 200 >= code <= 299:
         code = 200
     return make_response(jsonify(code=code, data=data, msg=msg), code)
+
+
+def timestamp_now():
+    return int(time())

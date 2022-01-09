@@ -25,7 +25,7 @@ class HandlerTagDetailView(MethodView):
         _name: str = request.args.get('name', None)
 
         if not _name:
-            raise ApiRequestException('401', 'params error')
+            raise ApiRequestException(400, 'params error')
 
         tag_query = db.session.query(BLOGTagsModel). \
             filter(BLOGTagsModel.name == _name).first()
@@ -43,7 +43,7 @@ class HandlerTagDetailView(MethodView):
         _name: str = request.json['name']
 
         if db.session.query(BLOGTagsModel.name).filter(BLOGTagsModel.name == _name).first():
-            raise ApiRequestException(401, 'unique name')
+            raise ApiRequestException(400, 'unique name')
 
         tag_query = BLOGTagsModel(
             name=_name,
