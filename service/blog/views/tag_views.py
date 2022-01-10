@@ -15,7 +15,8 @@ from flask import request
 from service import db
 from service.common.errors import ApiRequestException
 from service.common.bolts import success_response
-from service.models import (BLOGTagsModel)
+from service.models import (BLOGTagsModel,
+                            BLOGPostsTagsModel)
 from service.schema import (BLOGTagsSchema)
 
 
@@ -65,10 +66,17 @@ class HandlerTagDetailView(MethodView):
         _tag_id: int = request.json['tag_id']
         _name: str = request.json['name']
 
+        # update tags
         db.session.query(BLOGTagsModel). \
             filter(BLOGTagsModel.id == _tag_id,
                    BLOGTagsModel.name == _name). \
             update({BLOGTagsModel.status: 0})
+
+        # update post_tags
+        db.session.query(BLOGPostsTagsModel). \
+            filter(BLOGPostsTagsModel.tag_id == _tag_id). \
+            update({BLOGPostsTagsModel.status: 0})
+
         db.session.commit()
 
         return success_response(data=dict())

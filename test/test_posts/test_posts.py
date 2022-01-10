@@ -80,7 +80,7 @@ def test_post_change_status(client,
     assert resp['code'] == 200
 
 
-# create new users
+# create new users -> pytest -vv
 @pytest.mark.order(0)
 def test_post_query_list(client,
                          page=1,

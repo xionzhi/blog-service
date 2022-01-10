@@ -191,6 +191,8 @@ class HandlerPostListView(MethodView):
         """
         文章列表
         """
+        _tag_id: int = request.args.get('tag_id', 0, int)
+
         _page: int = request.args.get('page', 1, int)
         _size: int = request.args.get('size', 10, int)
 
@@ -198,6 +200,13 @@ class HandlerPostListView(MethodView):
             filter(BLOGPostsModel.status == 1,
                    BLOGPostsModel.post_status == 'publish'). \
             order_by(BLOGPostsModel.id.desc())
+
+        if _tag_id:
+            post_ids = db.session.query(BLOGPostsTagsModel.post_id). \
+                filter(BLOGPostsTagsModel.tag_id == _tag_id,
+                       BLOGPostsTagsModel.status == 1).all()
+            post_query = post_query. \
+                filter(BLOGPostsModel.id.in_([i.post_id for i in post_ids]))
 
         post_query = post_query.limit(_size).offset((_page - 1) * _size)
 
