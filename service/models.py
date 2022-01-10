@@ -77,7 +77,7 @@ class BLOGPostsModel(BaseModel):
     author_id = db.Column(db.Integer, nullable=False, comment='作者ID')
 
     __table_args__ = (db.Index('posts_slug_status_IDX', 'slug', 'status', unique=True), 
-                      db.Index('posts_slug_status_IDX', 'post_status'), )
+                      db.Index('posts_post_status_IDX', 'post_status'), )
 
 
 class BLOGTagsModel(BaseModel):

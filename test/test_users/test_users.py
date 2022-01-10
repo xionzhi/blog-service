@@ -12,6 +12,7 @@
 import pytest
 
 
+@pytest.mark.order(1)
 def test_user_create(client,
                      user_name,
                      user_slug,

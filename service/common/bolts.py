@@ -21,13 +21,13 @@ def success_response(data: dict, code: int = 200, msg: str = 'success') -> Respo
     return make_response(jsonify(code=code, data=data, msg=msg), code)
 
 
-def timestamp_now():
+def timestamp_now() -> int:
     return int(time())
 
 
-def bcrypt_hashpw(password: str):
+def bcrypt_hashpw(password: str) -> bytes:
     return hashpw(password.encode('utf-8'), gensalt())
 
 
-def bcrypt_checkpw(password, hashed):
+def bcrypt_checkpw(password: str, hashed: bytes) -> bool:
     return checkpw(password.encode('utf-8'), hashed)

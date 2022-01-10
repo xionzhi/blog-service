@@ -9,6 +9,8 @@
 # Description：
 """
 
+import pytest
+
 
 def test_post_create(client,
                      post_title,
@@ -78,6 +80,8 @@ def test_post_change_status(client,
     assert resp['code'] == 200
 
 
+# create new users
+@pytest.mark.order(0)
 def test_post_query_list(client,
                          page=1,
                          size=10):
