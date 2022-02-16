@@ -13,7 +13,7 @@ import os
 import logging.handlers
 
 
-SERVER_NAME = 'localhost:5001'
+# SERVER_NAME = 'localhost:5001'
 APP_DEBUG = True
 
 SQL_DEBUG = True

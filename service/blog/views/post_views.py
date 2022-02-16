@@ -234,8 +234,8 @@ class HandlerPostListView(MethodView):
         tags_data_dict = {k: sorted(v, key=lambda x: x.get('sort_order')) 
                           for k, v in groupby(tags_list, key=lambda x: x.get('post_id'))}
 
-        post_list = [i.update(user_data=user_data_dict[i['author_id']],
-                              post_tags_list=tags_data_dict[i['id']]) or i for i in post_list]
+        post_list = [i.update(user_data=user_data_dict.get(i['author_id'], {}),
+                              post_tags_list=tags_data_dict.get(i['id'], [])) or i for i in post_list]
 
         return success_response(data=dict(post_list=post_list,
                                           total=total, page=_page, size=_size))
